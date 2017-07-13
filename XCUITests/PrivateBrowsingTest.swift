@@ -107,7 +107,6 @@ class PrivateBrowsingTest: BaseTestCase {
 
         // Go back to regular mode and check the total number of tabs
         if isiPad() == true {
-//            app.buttons["TopTabsViewController.tabsButton"].tap()
             app.buttons["TabTrayController.maskButton"].tap()
 
         } else {

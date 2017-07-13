@@ -8,7 +8,7 @@ class ClipBoardTests: BaseTestCase {
     let url = "www.google.com"
     var navigator: Navigator!
     var app: XCUIApplication!
-
+    
     override func setUp() {
         super.setUp()
         app = XCUIApplication()
@@ -40,7 +40,7 @@ class ClipBoardTests: BaseTestCase {
         if let myString = UIPasteboard.general.string {
             var value = app.textFields["url"].value as! String
             value = "\(value)/"
-          XCTAssertNotNil(myString)
+            XCTAssertNotNil(myString)
             XCTAssertEqual(myString, value, "Url matches with the UIPasteboard")
         }
     }
@@ -56,12 +56,10 @@ class ClipBoardTests: BaseTestCase {
         app.buttons["IntroViewController.startBrowsingButton"].tap()
         
         if isiPad() == true {
-                app.textFields["url"].tap()
-                app.textFields["address"].press(forDuration: 1.7)
-                app.menuItems["Paste"].tap()
-                app.typeText("\r")
-
-           // }
+            app.textFields["url"].tap()
+            app.textFields["address"].press(forDuration: 1.7)
+            app.menuItems["Paste"].tap()
+            app.typeText("\r")
         } else {
             //Wait until recently copied pop up appears
             waitforExistence(app.buttons["Go"])

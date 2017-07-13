@@ -363,7 +363,6 @@ class ActivityStreamTest: BaseTestCase {
             XCTAssert(pagecontrolButton.exists, "The Page Control button must exist if more than 8 elements are displayed.")
         }
 
-
         pagecontrolButton.tap()
         pagecontrolButton.tap()
 
