@@ -327,7 +327,7 @@ class ActivityStreamTest: BaseTestCase {
             app.buttons["TabToolbar.backButton"].tap()
         }
 
-        loadWebPage("http://citibank.com")
+        loadWebPage("http://facebook.com")
         if isiPad() == true {
             app.buttons["URLBarView.backButton"].tap()
         } else {
