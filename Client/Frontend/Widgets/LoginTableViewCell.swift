@@ -42,6 +42,33 @@ class LoginTableViewCell: UITableViewCell {
 
     weak var delegate: LoginTableViewCellDelegate?
 
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        let index = (self.superview?.superview as! UITableView).indexPath(for: self)!
+        let item = InfoItem(rawValue: index.row)!
+
+        // Menu actions for password
+        if item == .passwordItem {
+            let showRevealOption = self.descriptionLabel.isSecureTextEntry ? (action == MenuHelper.SelectorReveal) : (action == MenuHelper.SelectorHide)
+            return action == MenuHelper.SelectorCopy || showRevealOption
+        }
+
+        // Menu actions for Website
+        if item == .websiteItem {
+            return action == MenuHelper.SelectorCopy || action == MenuHelper.SelectorOpenAndFill
+        }
+
+        // Menu actions for Username
+        if item == .usernameItem {
+            return action == MenuHelper.SelectorCopy
+        }
+        
+        return false
+    }
+
     lazy var descriptionLabel: UITextField = {
         let label = UITextField()
         label.font = LoginTableViewCellUX.descriptionLabelFont

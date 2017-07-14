@@ -7,7 +7,7 @@ import Storage
 import Shared
 import SwiftKeychainWrapper
 
-private enum InfoItem: Int {
+enum InfoItem: Int {
     case websiteItem = 0
     case usernameItem = 1
     case passwordItem = 2
@@ -64,10 +64,7 @@ class LoginDetailViewController: SensitiveViewController {
         self.profile = profile
         super.init(nibName: nil, bundle: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(LoginDetailViewController.SELwillShowMenuController), name: NSNotification.Name.UIMenuControllerWillShowMenu, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(LoginDetailViewController.SELwillHideMenuController), name: NSNotification.Name.UIMenuControllerWillHideMenu, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(LoginDetailViewController.dismissAlertController), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
-    }
+        }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -86,6 +83,10 @@ class LoginDetailViewController: SensitiveViewController {
         tableView.snp.makeConstraints { make in
             make.edges.equalTo(self.view)
         }
+    }
+
+
+    func foo(sender: Any) {
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -218,13 +219,38 @@ extension LoginDetailViewController: UITableViewDataSource {
     }
 }
 
+// Support UIMenuController show on single tap
+extension LoginDetailViewController {
+    // Required to show UIMenuController outside of using official canPerformAction method
+
+
+    func showMenu(forIndexPath indexPath: IndexPath) {
+        let item = InfoItem(rawValue: indexPath.row)!
+        if ![InfoItem.passwordItem, InfoItem.websiteItem, InfoItem.usernameItem].contains(item) {
+            return
+        }
+
+        guard let cell = tableView.cellForRow(at: indexPath) as? LoginTableViewCell else { return }
+
+        cell.becomeFirstResponder()
+
+        let menu = UIMenuController.shared
+        menu.setTargetRect(cell.frame, in: self.tableView)
+        menu.setMenuVisible(true, animated: true)
+    }
+}
+
 // MARK: - UITableViewDelegate
 extension LoginDetailViewController: UITableViewDelegate {
 
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+      func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath == InfoItem.deleteItem.indexPath {
             deleteLogin()
+        } else if !editingInfo {
+            showMenu(forIndexPath: indexPath)
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -238,42 +264,7 @@ extension LoginDetailViewController: UITableViewDelegate {
         }
     }
 
-    func tableView(_ tableView: UITableView, shouldShowMenuForRowAt indexPath: IndexPath) -> Bool {
-        let item = InfoItem(rawValue: indexPath.row)!
-        if item == .passwordItem || item == .websiteItem || item == .usernameItem {
-            menuControllerCell = tableView.cellForRow(at: indexPath) as? LoginTableViewCell
-            return true
-        }
 
-        return false
-    }
-
-    func tableView(_ tableView: UITableView, canPerformAction action: Selector, forRowAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        let item = InfoItem(rawValue: indexPath.row)!
-
-        // Menu actions for password
-        if item == .passwordItem {
-            let loginCell = tableView.cellForRow(at: indexPath) as! LoginTableViewCell
-            let showRevealOption = loginCell.descriptionLabel.isSecureTextEntry ? (action == MenuHelper.SelectorReveal) : (action == MenuHelper.SelectorHide)
-            return action == MenuHelper.SelectorCopy || showRevealOption
-        }
-
-        // Menu actions for Website
-        if item == .websiteItem {
-            return action == MenuHelper.SelectorCopy || action == MenuHelper.SelectorOpenAndFill
-        }
-
-        // Menu actions for Username
-        if item == .usernameItem {
-            return action == MenuHelper.SelectorCopy
-        }
-
-        return false
-    }
-
-    func tableView(_ tableView: UITableView, performAction action: Selector, forRowAt indexPath: IndexPath, withSender sender: Any?) {
-        // No-op. Needs to be overridden for custom menu action selectors to work.
-    }
 }
 
 // MARK: - KeyboardHelperDelegate
